@@ -1,0 +1,1842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description"
+        content="Track, understand, and reduce your personal carbon footprint with
+                 science-backed insights and personalised action plans." />
+
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; style-src 'self' 'unsafe-inline'
+                 https://fonts.googleapis.com;
+                 font-src https://fonts.gstatic.com;
+                 script-src 'self' 'unsafe-inline';
+                 img-src 'self' data:; frame-ancestors 'none';" />
+  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+
+  <title>EcoTrace — Carbon Footprint Awareness Platform</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap"
+        rel="stylesheet" />
+
+  <style>
+    /* Design Tokens */
+    :root {
+      --clr-bg:          #0a0f0d;
+      --clr-surface:     #111812;
+      --clr-surface-2:   #192019;
+      --clr-border:      #1e2b1e;
+      --clr-green-dim:   #2d5a2d;
+      --clr-green:       #4caf50;
+      --clr-green-bright:#76ff7a;
+      --clr-amber:       #ffb74d;
+      --clr-red:         #ef5350;
+      --clr-text:        #e8f5e9;
+      --clr-text-muted:  #6a8f6a;
+      --clr-text-faint:  #3a5c3a;
+
+      --radius-sm:  6px;
+      --radius-md:  12px;
+      --radius-lg:  20px;
+      --radius-xl:  32px;
+
+      --shadow-glow: 0 0 40px rgba(76, 175, 80, 0.12);
+      --shadow-card: 0 4px 24px rgba(0,0,0,.5);
+
+      --transition: 220ms cubic-bezier(0.4, 0, 0.2, 1);
+
+      --font-display: 'Syne', sans-serif;
+      --font-body:    'DM Sans', sans-serif;
+    }
+
+    /* Reset & Base */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html {
+      scroll-behavior: smooth;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      background-color: var(--clr-bg);
+      color: var(--clr-text);
+      font-family: var(--font-body);
+      font-size: clamp(14px, 1.5vw, 16px);
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Accessibility: visible focus rings everywhere */
+    :focus-visible {
+      outline: 2px solid var(--clr-green-bright);
+      outline-offset: 3px;
+      border-radius: var(--radius-sm);
+    }
+
+    img, svg { display: block; }
+
+    button {
+      font-family: inherit;
+      cursor: pointer;
+      border: none;
+      background: none;
+    }
+
+    input, select {
+      font-family: inherit;
+    }
+
+    /* Skip-to-content for keyboard users */
+    .skip-link {
+      position: absolute;
+      top: -999px;
+      left: 1rem;
+      background: var(--clr-green);
+      color: #000;
+      padding: .5rem 1rem;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      z-index: 9999;
+      transition: top var(--transition);
+    }
+    .skip-link:focus { top: 1rem; }
+
+    /* Layout */
+    .app-shell {
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      min-height: 100vh;
+    }
+
+    .container {
+      width: min(1100px, 100% - 3rem);
+      margin-inline: auto;
+    }
+
+    /* Header / Nav */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(16px) saturate(180%);
+      -webkit-backdrop-filter: blur(16px) saturate(180%);
+      background: rgba(10,15,13,.85);
+      border-bottom: 1px solid var(--clr-border);
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-block: 1rem;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      font-weight: 800;
+      letter-spacing: -.02em;
+      color: var(--clr-green-bright);
+      text-decoration: none;
+    }
+
+    .logo-icon {
+      width: 32px; height: 32px;
+      background: linear-gradient(135deg, #4caf50, #76ff7a);
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    .nav-score-badge {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      background: var(--clr-surface-2);
+      border: 1px solid var(--clr-border);
+      border-radius: 999px;
+      padding: .35rem .85rem;
+      font-size: .8rem;
+      font-weight: 500;
+      color: var(--clr-text-muted);
+    }
+
+    .nav-score-badge .score-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--clr-green);
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: .5; transform: scale(.7); }
+    }
+
+    /* Hero */
+    .hero {
+      padding-block: clamp(3rem, 8vw, 6rem);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Subtle radial glow behind hero text */
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 60% 50% at 50% 0%,
+                  rgba(76,175,80,.18) 0%,
+                  transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      background: rgba(76,175,80,.1);
+      border: 1px solid rgba(76,175,80,.25);
+      border-radius: 999px;
+      padding: .3rem .9rem;
+      font-size: .78rem;
+      font-weight: 500;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--clr-green);
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(2.2rem, 6vw, 4.2rem);
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -.03em;
+      margin-bottom: 1.2rem;
+    }
+
+    .hero-title em {
+      font-style: normal;
+      background: linear-gradient(135deg, #76ff7a 0%, #4caf50 50%, #ffb74d 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-sub {
+      max-width: 52ch;
+      margin-inline: auto;
+      color: var(--clr-text-muted);
+      font-size: 1.05rem;
+      font-weight: 300;
+      margin-bottom: 2.5rem;
+    }
+
+    .hero-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      background: linear-gradient(135deg, #4caf50, #388e3c);
+      color: #fff;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1rem;
+      padding: .85rem 2rem;
+      border-radius: var(--radius-xl);
+      text-decoration: none;
+      transition: transform var(--transition), box-shadow var(--transition);
+      box-shadow: 0 4px 20px rgba(76,175,80,.35);
+    }
+
+    .hero-cta:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(76,175,80,.45);
+    }
+
+    /* Stats Strip */
+    .stats-strip {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1px;
+      background: var(--clr-border);
+      border: 1px solid var(--clr-border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin-bottom: clamp(2.5rem, 5vw, 4rem);
+    }
+
+    .stat-cell {
+      background: var(--clr-surface);
+      padding: 1.5rem;
+      text-align: center;
+    }
+
+    .stat-cell .stat-val {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--clr-green-bright);
+      line-height: 1;
+    }
+
+    .stat-cell .stat-label {
+      font-size: .75rem;
+      color: var(--clr-text-muted);
+      margin-top: .35rem;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+
+    /* Section Titles */
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.3rem, 3vw, 1.7rem);
+      font-weight: 700;
+      letter-spacing: -.02em;
+    }
+
+    .section-sub {
+      font-size: .85rem;
+      color: var(--clr-text-muted);
+    }
+
+    /* Calculator */
+    .calculator-section {
+      margin-bottom: clamp(3rem, 6vw, 5rem);
+    }
+
+    .calc-tabs {
+      display: flex;
+      gap: .5rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+    }
+
+    .tab-btn {
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+      padding: .55rem 1.1rem;
+      border-radius: 999px;
+      font-size: .85rem;
+      font-weight: 500;
+      color: var(--clr-text-muted);
+      border: 1px solid var(--clr-border);
+      background: var(--clr-surface);
+      transition: all var(--transition);
+    }
+
+    .tab-btn:hover {
+      border-color: var(--clr-green-dim);
+      color: var(--clr-text);
+    }
+
+    .tab-btn[aria-selected="true"] {
+      background: var(--clr-green-dim);
+      border-color: var(--clr-green);
+      color: var(--clr-green-bright);
+    }
+
+    .calc-panel {
+      display: none !important;
+    }
+
+    .calc-panel.active {
+      display: grid !important;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1rem;
+    }
+
+    /* Input Card */
+    .input-card {
+      background: var(--clr-surface);
+      border: 1px solid var(--clr-border);
+      border-radius: var(--radius-md);
+      padding: 1.25rem;
+      transition: border-color var(--transition);
+    }
+
+    .input-card:focus-within {
+      border-color: var(--clr-green-dim);
+    }
+
+    .input-card label {
+      display: block;
+      font-size: .78rem;
+      font-weight: 500;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      color: var(--clr-text-muted);
+      margin-bottom: .6rem;
+    }
+
+    .input-row {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+
+    .input-row input,
+    .input-row select {
+      flex: 1;
+      background: var(--clr-surface-2);
+      border: 1px solid var(--clr-border);
+      border-radius: var(--radius-sm);
+      padding: .55rem .8rem;
+      color: var(--clr-text);
+      font-size: .95rem;
+      transition: border-color var(--transition);
+      width: 100%;
+    }
+
+    .input-row input:focus,
+    .input-row select:focus {
+      outline: none;
+      border-color: var(--clr-green);
+    }
+
+    /* Remove browser default appearance for number input spinners */
+    .input-row input[type=number]::-webkit-inner-spin-button,
+    .input-row input[type=number]::-webkit-outer-spin-button {
+      opacity: .4;
+    }
+
+    .input-unit {
+      font-size: .75rem;
+      color: var(--clr-text-faint);
+      white-space: nowrap;
+    }
+
+    /* Range slider */
+    .range-wrapper {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+    }
+
+    .range-wrapper input[type=range] {
+      flex: 1;
+      accent-color: var(--clr-green);
+      height: 4px;
+      cursor: pointer;
+    }
+
+    .range-val {
+      font-family: var(--font-display);
+      font-size: .9rem;
+      font-weight: 700;
+      color: var(--clr-green-bright);
+      min-width: 3ch;
+      text-align: right;
+    }
+
+    /* Calculate Button */
+    .calc-actions {
+      margin-top: 1.5rem;
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      flex: 1;
+      min-width: 160px;
+      background: linear-gradient(135deg, #4caf50, #388e3c);
+      color: #fff;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1rem;
+      padding: .85rem 1.5rem;
+      border-radius: var(--radius-xl);
+      transition: transform var(--transition), box-shadow var(--transition);
+      box-shadow: 0 4px 16px rgba(76,175,80,.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(76,175,80,.4);
+    }
+
+    .btn-secondary {
+      flex: 0 1 auto;
+      background: var(--clr-surface);
+      border: 1px solid var(--clr-border);
+      color: var(--clr-text-muted);
+      font-weight: 500;
+      font-size: .9rem;
+      padding: .85rem 1.5rem;
+      border-radius: var(--radius-xl);
+      transition: all var(--transition);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--clr-green-dim);
+      color: var(--clr-text);
+    }
+
+    /* Results Dashboard */
+    #results-section {
+      margin-bottom: clamp(3rem, 6vw, 5rem);
+      display: none;
+    }
+
+    #results-section.visible {
+      display: block;
+      animation: fade-up .5s ease forwards;
+    }
+
+    .results-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .result-card {
+      background: var(--clr-surface);
+      border: 1px solid var(--clr-border);
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .result-card::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--accent, var(--clr-green));
+    }
+
+    .result-card .rc-icon {
+      font-size: 1.5rem;
+      margin-bottom: .75rem;
+    }
+
+    .result-card .rc-val {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      font-weight: 800;
+      line-height: 1;
+      color: var(--clr-green-bright);
+    }
+
+    .result-card .rc-unit {
+      font-size: .75rem;
+      color: var(--clr-text-muted);
+      font-weight: 400;
+    }
+
+    .result-card .rc-label {
+      font-size: .8rem;
+      color: var(--clr-text-muted);
+      margin-top: .4rem;
+    }
+
+    /* Gauge Bar */
+    .gauge-bar-track {
+      height: 8px;
+      background: var(--clr-surface-2);
+      border-radius: 999px;
+      margin-top: .75rem;
+      overflow: hidden;
+    }
+
+    .gauge-bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--clr-green) 0%, var(--clr-amber) 60%, var(--clr-red) 100%);
+      width: 0%;
+      transition: width .8s cubic-bezier(0.4,0,0.2,1) .3s;
+    }
+
+    /* SVG Donut Chart */
+    .chart-card {
+      background: var(--clr-surface);
+      border: 1px solid var(--clr-border);
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+    }
+
+    .chart-title {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 1.25rem;
+    }
+
+    .donut-container {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .donut-svg {
+      flex-shrink: 0;
+      width: 140px;
+      height: 140px;
+    }
+
+    .donut-legend {
+      flex: 1;
+      min-width: 140px;
+      display: flex;
+      flex-direction: column;
+      gap: .65rem;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      font-size: .82rem;
+    }
+
+    .legend-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .legend-name { flex: 1; color: var(--clr-text-muted); }
+    .legend-pct  { font-weight: 600; color: var(--clr-text); }
+
+    /* Insights / Recommendations */
+    .insights-section {
+      margin-bottom: clamp(3rem, 6vw, 5rem);
+    }
+
+    .insight-list {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .insight-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      background: var(--clr-surface);
+      border: 1px solid var(--clr-border);
+      border-radius: var(--radius-md);
+      padding: 1.25rem 1.5rem;
+      transition: border-color var(--transition), transform var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .insight-card:hover {
+      border-color: var(--clr-green-dim);
+      transform: translateX(4px);
+    }
+
+    .insight-card .ic-impact {
+      position: absolute;
+      top: .75rem; right: 1rem;
+      font-size: .7rem;
+      font-weight: 600;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      padding: .2rem .55rem;
+      border-radius: 999px;
+    }
+
+    .impact-high   { background: rgba(76,175,80,.15); color: var(--clr-green); }
+    .impact-medium { background: rgba(255,183,77,.15); color: var(--clr-amber); }
+    .impact-low    { background: rgba(239,83,80,.12);  color: var(--clr-red);   }
+
+    .ic-icon {
+      font-size: 1.5rem;
+      flex-shrink: 0;
+      margin-top: .1rem;
+    }
+
+    .ic-body {}
+    .ic-title {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: .95rem;
+      margin-bottom: .3rem;
+    }
+    .ic-desc {
+      font-size: .84rem;
+      color: var(--clr-text-muted);
+      line-height: 1.55;
+    }
+    .ic-saving {
+      font-size: .78rem;
+      color: var(--clr-green);
+      font-weight: 500;
+      margin-top: .4rem;
+    }
+
+    /* Activity Tracker */
+    .tracker-section {
+      margin-bottom: clamp(3rem, 6vw, 5rem);
+    }
+
+    .log-form {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: .75rem;
+      align-items: end;
+      background: var(--clr-surface);
+      border: 1px solid var(--clr-border);
+      border-radius: var(--radius-md);
+      padding: 1.25rem;
+      margin-bottom: 1.25rem;
+    }
+
+    @media (max-width: 560px) {
+      .log-form { grid-template-columns: 1fr; }
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: .4rem;
+    }
+
+    .form-group label {
+      font-size: .75rem;
+      font-weight: 500;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      color: var(--clr-text-muted);
+    }
+
+    .form-group select,
+    .form-group input {
+      background: var(--clr-surface-2);
+      border: 1px solid var(--clr-border);
+      border-radius: var(--radius-sm);
+      padding: .6rem .85rem;
+      color: var(--clr-text);
+      font-size: .92rem;
+      transition: border-color var(--transition);
+    }
+
+    .form-group select:focus,
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--clr-green);
+    }
+
+    .btn-add {
+      background: var(--clr-green-dim);
+      border: 1px solid var(--clr-green);
+      color: var(--clr-green-bright);
+      font-weight: 700;
+      padding: .6rem 1.25rem;
+      border-radius: var(--radius-sm);
+      white-space: nowrap;
+      transition: all var(--transition);
+    }
+
+    .btn-add:hover {
+      background: #2d5a2d;
+    }
+
+    /* Activity log table */
+    .activity-log {
+      background: var(--clr-surface);
+      border: 1px solid var(--clr-border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+
+    .activity-log table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .activity-log th {
+      text-align: left;
+      padding: .85rem 1.25rem;
+      font-size: .72rem;
+      font-weight: 600;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--clr-text-muted);
+      border-bottom: 1px solid var(--clr-border);
+      background: var(--clr-surface-2);
+    }
+
+    .activity-log td {
+      padding: .9rem 1.25rem;
+      font-size: .88rem;
+      border-bottom: 1px solid var(--clr-border);
+      vertical-align: middle;
+    }
+
+    .activity-log tr:last-child td { border-bottom: none; }
+
+    .activity-log tbody tr {
+      transition: background var(--transition);
+    }
+
+    .activity-log tbody tr:hover {
+      background: var(--clr-surface-2);
+    }
+
+    .emission-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: .3rem;
+      font-size: .78rem;
+      font-weight: 600;
+      padding: .2rem .55rem;
+      border-radius: 999px;
+      background: rgba(76,175,80,.1);
+      color: var(--clr-green);
+    }
+
+    .delete-btn {
+      color: var(--clr-text-faint);
+      font-size: .85rem;
+      padding: .3rem .6rem;
+      border-radius: var(--radius-sm);
+      transition: all var(--transition);
+    }
+
+    .delete-btn:hover {
+      color: var(--clr-red);
+      background: rgba(239,83,80,.1);
+    }
+
+    .log-empty {
+      padding: 3rem;
+      text-align: center;
+      color: var(--clr-text-muted);
+      font-size: .9rem;
+    }
+
+    /* Global Comparison */
+    .comparison-section {
+      margin-bottom: clamp(3rem, 6vw, 5rem);
+    }
+
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+
+    .compare-card {
+      background: var(--clr-surface);
+      border: 1px solid var(--clr-border);
+      border-radius: var(--radius-md);
+      padding: 1.25rem;
+    }
+
+    .compare-card .cc-flag { font-size: 1.5rem; margin-bottom: .5rem; }
+    .compare-card .cc-country {
+      font-size: .72rem;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--clr-text-muted);
+      margin-bottom: .25rem;
+    }
+    .compare-card .cc-val {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: .4rem;
+    }
+
+    .bar-track {
+      height: 6px;
+      background: var(--clr-surface-2);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: var(--fill-clr, var(--clr-green));
+      width: var(--fill-w, 0%);
+    }
+
+    /* Footer */
+    .site-footer {
+      border-top: 1px solid var(--clr-border);
+      padding-block: 2rem;
+      text-align: center;
+      font-size: .8rem;
+      color: var(--clr-text-faint);
+    }
+
+    .site-footer a {
+      color: var(--clr-text-muted);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    /* Utilities & Animations */
+    .sr-only {
+      position: absolute;
+      width: 1px; height: 1px;
+      overflow: hidden;
+      clip: rect(0,0,0,0);
+      white-space: nowrap;
+    }
+
+    @keyframes fade-up {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .fade-up {
+      opacity: 0;
+      animation: fade-up .6s ease forwards;
+    }
+
+    .fade-up:nth-child(1) { animation-delay: .1s; }
+    .fade-up:nth-child(2) { animation-delay: .2s; }
+    .fade-up:nth-child(3) { animation-delay: .3s; }
+    .fade-up:nth-child(4) { animation-delay: .4s; }
+
+    /* Live Region (Accessibility announcements) */
+    #a11y-live { position: absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .calc-actions { flex-direction: column; }
+      .btn-primary, .btn-secondary { width: 100%; }
+      .donut-container { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Accessibility: Skip navigation landmark -->
+<a class="skip-link" href="#main-content">Skip to main content</a>
+
+<!-- Live region for screen-reader announcements -->
+<div id="a11y-live" role="status" aria-live="polite" aria-atomic="true"></div>
+
+<div class="app-shell">
+
+  <!-- =====================================================================
+       Header
+       ===================================================================== -->
+  <header class="site-header" role="banner">
+    <nav class="nav container" aria-label="Primary navigation">
+      <a href="#" class="logo" aria-label="EcoTrace home">
+        <div class="logo-icon" aria-hidden="true">🌿</div>
+        EcoTrace
+      </a>
+
+      <div class="nav-score-badge" aria-label="Platform status: active">
+        <span class="score-dot" aria-hidden="true"></span>
+        Live Tracking
+      </div>
+    </nav>
+  </header>
+
+  <!-- =====================================================================
+       Main
+       ===================================================================== -->
+  <main id="main-content" role="main">
+    <div class="container">
+
+      <!-- Hero -->
+      <section class="hero" aria-labelledby="hero-heading">
+        <div class="hero-eyebrow" aria-hidden="true">🌍 Climate Action Platform</div>
+        <h1 class="hero-title" id="hero-heading">
+          Know your impact.<br/>
+          <em>Own your future.</em>
+        </h1>
+        <p class="hero-sub">
+          Science-backed carbon tracking for daily life — transport, food, energy, and
+          shopping — with personalised reduction plans that actually move the needle.
+        </p>
+        <a href="#calculator" class="hero-cta" data-testid="hero-cta">
+          Calculate My Footprint →
+        </a>
+      </section>
+
+      <!-- Stats Strip -->
+      <div class="stats-strip" role="region" aria-label="Global climate statistics">
+        <div class="stat-cell">
+          <div class="stat-val" aria-label="4.7 tonnes">4.7t</div>
+          <div class="stat-label">World avg CO₂/year</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-val">2.0t</div>
+          <div class="stat-label">Paris target 2050</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-val">1.8t</div>
+          <div class="stat-label">India avg CO₂/year</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-val">16t</div>
+          <div class="stat-label">US avg CO₂/year</div>
+        </div>
+      </div>
+
+      <!-- =================================================================
+           Carbon Calculator
+           ================================================================= -->
+      <section id="calculator"
+               class="calculator-section"
+               aria-labelledby="calc-heading"
+               data-testid="calculator-section">
+        <div class="section-header">
+          <h2 class="section-title" id="calc-heading">Carbon Calculator</h2>
+          <span class="section-sub">Emission factors: IPCC AR6 / IEA 2024</span>
+        </div>
+
+        <!-- Tab navigation -->
+        <div class="calc-tabs" role="tablist" aria-label="Calculator categories">
+          <button class="tab-btn"
+                  role="tab"
+                  aria-selected="true"
+                  aria-controls="panel-transport"
+                  data-tab="transport"
+                  data-testid="tab-transport">
+            🚗 Transport
+          </button>
+          <button class="tab-btn"
+                  role="tab"
+                  aria-selected="false"
+                  aria-controls="panel-energy"
+                  data-tab="energy"
+                  data-testid="tab-energy">
+            ⚡ Energy
+          </button>
+          <button class="tab-btn"
+                  role="tab"
+                  aria-selected="false"
+                  aria-controls="panel-food"
+                  data-tab="food"
+                  data-testid="tab-food">
+            🥗 Food
+          </button>
+          <button class="tab-btn"
+                  role="tab"
+                  aria-selected="false"
+                  aria-controls="panel-shopping"
+                  data-tab="shopping"
+                  data-testid="tab-shopping">
+            🛒 Shopping
+          </button>
+        </div>
+
+        <!-- Transport Panel -->
+        <div id="panel-transport"
+             class="calc-panel active"
+             role="tabpanel"
+             aria-labelledby="tab-transport-btn"
+             data-testid="panel-transport">
+
+          <div class="input-card">
+            <label for="car-km">Weekly car distance</label>
+            <div class="input-row">
+              <input type="number" id="car-km" min="0" max="5000" value="100"
+                     aria-describedby="car-km-hint"
+                     data-testid="input-car-km" />
+              <span class="input-unit" id="car-km-hint">km / week</span>
+            </div>
+          </div>
+
+          <div class="input-card">
+            <label for="car-type">Vehicle type</label>
+            <div class="input-row">
+              <select id="car-type" data-testid="select-car-type"
+                      aria-label="Select vehicle type">
+                <option value="0.192">Petrol — avg</option>
+                <option value="0.171">Diesel — avg</option>
+                <option value="0.073">Hybrid (HEV)</option>
+                <option value="0.047">Electric (BEV)</option>
+                <option value="0.105">CNG / LPG</option>
+                <option value="0">Walk / Cycle</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="input-card">
+            <label for="flights-short">Short-haul flights per year</label>
+            <div class="range-wrapper">
+              <input type="range" id="flights-short" min="0" max="20" value="2"
+                     aria-valuemin="0" aria-valuemax="20" aria-valuenow="2"
+                     data-testid="range-flights-short" />
+              <span class="range-val" id="flights-short-val" aria-live="polite">2</span>
+            </div>
+          </div>
+
+          <div class="input-card">
+            <label for="flights-long">Long-haul flights per year</label>
+            <div class="range-wrapper">
+              <input type="range" id="flights-long" min="0" max="10" value="1"
+                     aria-valuemin="0" aria-valuemax="10" aria-valuenow="1"
+                     data-testid="range-flights-long" />
+              <span class="range-val" id="flights-long-val" aria-live="polite">1</span>
+            </div>
+          </div>
+
+          <div class="input-card">
+            <label for="transit-km">Public transit (bus/train) per week</label>
+            <div class="input-row">
+              <input type="number" id="transit-km" min="0" max="1000" value="30"
+                     data-testid="input-transit-km" />
+              <span class="input-unit">km / week</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Energy Panel -->
+        <div id="panel-energy"
+             class="calc-panel"
+             role="tabpanel"
+             aria-labelledby="tab-energy-btn"
+             hidden
+             data-testid="panel-energy">
+
+          <div class="input-card">
+            <label for="electricity-kwh">Monthly electricity usage</label>
+            <div class="input-row">
+              <input type="number" id="electricity-kwh" min="0" max="5000" value="200"
+                     data-testid="input-electricity" />
+              <span class="input-unit">kWh / mo</span>
+            </div>
+          </div>
+
+          <div class="input-card">
+            <label for="grid-type">Electricity grid mix</label>
+            <div class="input-row">
+              <select id="grid-type" data-testid="select-grid">
+                <option value="0.82">India — avg grid</option>
+                <option value="0.23">India — green tariff</option>
+                <option value="0.45">Global avg</option>
+                <option value="0.28">EU avg</option>
+                <option value="0.39">US avg</option>
+                <option value="0.03">100% Renewables</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="input-card">
+            <label for="lpg-cylinders">LPG cylinders per month</label>
+            <div class="input-row">
+              <input type="number" id="lpg-cylinders" min="0" max="10" value="1"
+                     step="0.5" data-testid="input-lpg" />
+              <span class="input-unit">× 14.2 kg</span>
+            </div>
+          </div>
+
+          <div class="input-card">
+            <label for="renewable-pct">Renewable energy used at home</label>
+            <div class="range-wrapper">
+              <input type="range" id="renewable-pct" min="0" max="100" value="0"
+                     data-testid="range-renewable" />
+              <span class="range-val" id="renewable-pct-val" aria-live="polite">0%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Food Panel -->
+        <div id="panel-food"
+             class="calc-panel"
+             role="tabpanel"
+             aria-labelledby="tab-food-btn"
+             hidden
+             data-testid="panel-food">
+
+          <div class="input-card">
+            <label for="diet-type">Primary diet type</label>
+            <div class="input-row">
+              <select id="diet-type" data-testid="select-diet">
+                <option value="3.3">High meat (daily)</option>
+                <option value="2.5" selected>Medium meat (few/wk)</option>
+                <option value="1.9">Low meat (once/wk)</option>
+                <option value="1.7">Pescatarian</option>
+                <option value="1.5">Vegetarian</option>
+                <option value="1.1">Vegan</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="input-card">
+            <label for="food-waste">Weekly food waste level</label>
+            <div class="input-row">
+              <select id="food-waste" data-testid="select-food-waste">
+                <option value="0.1">Minimal — I plan meals</option>
+                <option value="0.3" selected>Average — some waste</option>
+                <option value="0.5">High — frequent waste</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="input-card">
+            <label for="local-food">Locally sourced food (% of diet)</label>
+            <div class="range-wrapper">
+              <input type="range" id="local-food" min="0" max="100" value="20"
+                     data-testid="range-local-food" />
+              <span class="range-val" id="local-food-val" aria-live="polite">20%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Shopping Panel -->
+        <div id="panel-shopping"
+             class="calc-panel"
+             role="tabpanel"
+             aria-labelledby="tab-shopping-btn"
+             hidden
+             data-testid="panel-shopping">
+
+          <div class="input-card">
+            <label for="clothing-items">New clothing items per month</label>
+            <div class="input-row">
+              <input type="number" id="clothing-items" min="0" max="50" value="3"
+                     data-testid="input-clothing" />
+              <span class="input-unit">items</span>
+            </div>
+          </div>
+
+          <div class="input-card">
+            <label for="electronics">Electronics purchases per year</label>
+            <div class="input-row">
+              <input type="number" id="electronics" min="0" max="20" value="2"
+                     data-testid="input-electronics" />
+              <span class="input-unit">devices / yr</span>
+            </div>
+          </div>
+
+          <div class="input-card">
+            <label for="streaming-hours">Daily streaming / screen hours</label>
+            <div class="range-wrapper">
+              <input type="range" id="streaming-hours" min="0" max="16" value="4"
+                     data-testid="range-streaming" />
+              <span class="range-val" id="streaming-val" aria-live="polite">4h</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="calc-actions">
+          <button class="btn-primary"
+                  id="calculate-btn"
+                  aria-controls="results-section"
+                  data-testid="btn-calculate">
+            Calculate My Carbon Footprint
+          </button>
+          <button class="btn-secondary"
+                  id="reset-btn"
+                  data-testid="btn-reset">
+            Reset
+          </button>
+        </div>
+      </section>
+
+      <!-- =================================================================
+           Results
+           ================================================================= -->
+      <section id="results-section"
+               aria-labelledby="results-heading"
+               aria-live="polite"
+               data-testid="results-section">
+        <div class="section-header">
+          <h2 class="section-title" id="results-heading">Your Carbon Footprint</h2>
+        </div>
+
+        <div class="results-grid">
+          <div class="result-card fade-up" style="--accent: #4caf50">
+            <div class="rc-icon" aria-hidden="true">🌍</div>
+            <div>
+              <span class="rc-val" id="total-co2" aria-live="polite">—</span>
+              <span class="rc-unit"> tCO₂e / year</span>
+            </div>
+            <div class="rc-label">Your annual footprint</div>
+            <div class="gauge-bar-track" aria-hidden="true">
+              <div class="gauge-bar-fill" id="total-gauge"></div>
+            </div>
+          </div>
+
+          <div class="result-card fade-up" style="--accent: #29b6f6">
+            <div class="rc-icon" aria-hidden="true">🚗</div>
+            <div>
+              <span class="rc-val" id="transport-co2">—</span>
+              <span class="rc-unit"> tCO₂e / yr</span>
+            </div>
+            <div class="rc-label">Transport emissions</div>
+          </div>
+
+          <div class="result-card fade-up" style="--accent: #ffb74d">
+            <div class="rc-icon" aria-hidden="true">⚡</div>
+            <div>
+              <span class="rc-val" id="energy-co2">—</span>
+              <span class="rc-unit"> tCO₂e / yr</span>
+            </div>
+            <div class="rc-label">Energy emissions</div>
+          </div>
+
+          <div class="result-card fade-up" style="--accent: #66bb6a">
+            <div class="rc-icon" aria-hidden="true">🥗</div>
+            <div>
+              <span class="rc-val" id="food-co2">—</span>
+              <span class="rc-unit"> tCO₂e / yr</span>
+            </div>
+            <div class="rc-label">Food emissions</div>
+          </div>
+        </div>
+
+        <!-- Donut Chart -->
+        <div class="chart-card" aria-labelledby="chart-title">
+          <h3 class="chart-title" id="chart-title">Emissions Breakdown</h3>
+          <div class="donut-container">
+            <svg class="donut-svg"
+                 viewBox="0 0 140 140"
+                 aria-label="Donut chart showing emissions by category"
+                 role="img">
+              <circle cx="70" cy="70" r="54"
+                      fill="none" stroke="#192019" stroke-width="22" />
+              <!-- Segments injected by JS -->
+              <g id="donut-segments"></g>
+              <text x="70" y="66" text-anchor="middle"
+                    font-family="Syne, sans-serif" font-size="16"
+                    font-weight="800" fill="#76ff7a" id="donut-center-val">—</text>
+              <text x="70" y="82" text-anchor="middle"
+                    font-size="9" fill="#6a8f6a">tCO₂e/yr</text>
+            </svg>
+            <div class="donut-legend" id="donut-legend" aria-label="Chart legend">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =================================================================
+           Personalised Insights
+           ================================================================= -->
+      <section class="insights-section"
+               aria-labelledby="insights-heading"
+               data-testid="insights-section">
+        <div class="section-header">
+          <h2 class="section-title" id="insights-heading">Your Personalised Action Plan</h2>
+          <span class="section-sub" id="insights-sub"></span>
+        </div>
+        <div class="insight-list" id="insight-list" role="list">
+          <!-- Populated dynamically -->
+          <p class="log-empty" id="insights-placeholder">
+            Calculate your footprint above to unlock personalised recommendations.
+          </p>
+        </div>
+      </section>
+
+      <!-- =================================================================
+           Daily Activity Tracker
+           ================================================================= -->
+      <section class="tracker-section"
+               aria-labelledby="tracker-heading"
+               data-testid="tracker-section">
+        <div class="section-header">
+          <h2 class="section-title" id="tracker-heading">Daily Activity Log</h2>
+          <span class="section-sub">Track individual actions over time</span>
+        </div>
+
+        <div class="log-form" role="form" aria-label="Add activity entry">
+          <div class="form-group">
+            <label for="activity-type">Activity</label>
+            <select id="activity-type" data-testid="select-activity">
+              <option value="car_petrol"    data-factor="0.192">Car (petrol) — per km</option>
+              <option value="car_electric"  data-factor="0.047">Car (electric) — per km</option>
+              <option value="flight_short"  data-factor="0.255">Flight short-haul — per km</option>
+              <option value="flight_long"   data-factor="0.195">Flight long-haul — per km</option>
+              <option value="veg_meal"      data-factor="0.5">Vegetarian meal</option>
+              <option value="meat_meal"     data-factor="3.6">Beef/lamb meal</option>
+              <option value="electricity"   data-factor="0.82">Electricity — India grid, per kWh</option>
+              <option value="streaming"     data-factor="0.036">Streaming video — per hour</option>
+              <option value="clothing_new"  data-factor="6.0">New clothing item (avg)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="activity-qty">Quantity</label>
+            <input type="number" id="activity-qty" min="0.1" step="0.1" value="10"
+                   data-testid="input-activity-qty"
+                   aria-describedby="activity-unit-hint" />
+          </div>
+
+          <button class="btn-add" id="add-activity-btn"
+                  data-testid="btn-add-activity"
+                  aria-label="Add activity to log">
+            + Add
+          </button>
+        </div>
+
+        <div class="activity-log" role="region" aria-label="Activity log table">
+          <table aria-label="Logged activities">
+            <thead>
+              <tr>
+                <th scope="col">Activity</th>
+                <th scope="col">Quantity</th>
+                <th scope="col">Emission</th>
+                <th scope="col">Date</th>
+                <th scope="col"><span class="sr-only">Actions</span></th>
+              </tr>
+            </thead>
+            <tbody id="activity-tbody">
+              <tr id="empty-row">
+                <td colspan="5" class="log-empty">
+                  No activities logged yet — start tracking above.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- =================================================================
+           Global Comparison
+           ================================================================= -->
+      <section class="comparison-section"
+               aria-labelledby="compare-heading"
+               data-testid="comparison-section">
+        <div class="section-header">
+          <h2 class="section-title" id="compare-heading">Global Context</h2>
+          <span class="section-sub">Per-capita CO₂ averages — IEA 2023</span>
+        </div>
+
+        <div class="comparison-grid" role="list">
+          <!-- Cards rendered by JS on load -->
+        </div>
+      </section>
+
+    </div><!-- /.container -->
+  </main>
+
+  <!-- =====================================================================
+       Footer
+       ===================================================================== -->
+  <footer class="site-footer" role="contentinfo">
+    <div class="container">
+      <p>
+        EcoTrace © 2024 — Emission factors sourced from
+        <a href="https://www.ipcc.ch/report/ar6/wg3/"
+           target="_blank" rel="noopener noreferrer"
+           aria-label="IPCC AR6 Working Group III (opens in new tab)">IPCC AR6 WG3</a>
+        &amp;
+        <a href="https://www.iea.org/data-and-statistics/data-tools/greenhouse-gas-emissions-from-energy-data-explorer"
+           target="_blank" rel="noopener noreferrer"
+           aria-label="IEA Greenhouse Gas Emissions Explorer (opens in new tab)">IEA 2024</a>.
+        For educational purposes.
+      </p>
+    </div>
+  </footer>
+
+</div><!-- /.app-shell -->
+
+
+<script>
+'use strict';
+
+// Emission factors: IPCC AR6 WG3 Annex III + IEA 2024 (kg CO2e per unit)
+const EF = Object.freeze({
+  CAR_KM:          0.192,
+  TRANSIT_KM:      0.089,
+  FLIGHT_SHORT_KM: 0.255,  // includes radiative forcing
+  FLIGHT_LONG_KM:  0.195,
+  LPG_KG:          2.983,
+  CLOTHING_ITEM:   6.0,
+  ELECTRONICS_DEV: 70.0,
+  STREAMING_HOUR:  0.036,
+});
+
+const SHORT_FLIGHT_KM = 1000;
+const LONG_FLIGHT_KM  = 8000;
+
+let state = { results: null, log: [] };
+let logIdSeq = 0;
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+
+const $  = id => document.getElementById(id);
+const fv = (id, fb = 0) => { const v = parseFloat($(`${id}`)?.value); return Number.isFinite(v) ? Math.max(0, v) : fb; };
+
+function esc(v) {
+  return String(v ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#x27;');
+}
+
+function setText(id, v) {
+  const el = $(id);
+  if (el) el.textContent = String(v ?? '');
+}
+
+function announce(msg) {
+  const el = $('a11y-live');
+  if (!el) return;
+  el.textContent = '';
+  setTimeout(() => { el.textContent = msg; }, 50);
+}
+
+// ── Emissions Calculator ─────────────────────────────────────────────────────
+
+function calcEmissions() {
+  const carKm    = fv('car-km');
+  const carEF    = fv('car-type', EF.CAR_KM);
+  const transit  = fv('transit-km');
+
+  const transport = (
+    carKm * 52 * carEF
+    + fv('flights-short') * SHORT_FLIGHT_KM * EF.FLIGHT_SHORT_KM
+    + fv('flights-long')  * LONG_FLIGHT_KM  * EF.FLIGHT_LONG_KM
+    + transit * 52 * EF.TRANSIT_KM
+  ) / 1000;
+
+  const gridEF = fv('grid-type', 0.82) * (1 - fv('renewable-pct') / 100);
+  const energy = (
+    fv('electricity-kwh') * 12 * gridEF
+    + fv('lpg-cylinders') * 12 * 14.2 * EF.LPG_KG
+  ) / 1000;
+
+  const food = (fv('diet-type', 2.5) + fv('food-waste', 0.3))
+             * (1 - fv('local-food') / 100 * 0.15);
+
+  const shopping = (
+    fv('clothing-items') * 12 * EF.CLOTHING_ITEM
+    + fv('electronics') * EF.ELECTRONICS_DEV
+    + fv('streaming-hours') * 365 * EF.STREAMING_HOUR
+  ) / 1000;
+
+  const fmt = n => +n.toFixed(2);
+  return {
+    transport: fmt(transport),
+    energy:    fmt(energy),
+    food:      fmt(food),
+    shopping:  fmt(shopping),
+    total:     fmt(transport + energy + food + shopping),
+  };
+}
+
+// ── Insights Engine ──────────────────────────────────────────────────────────
+
+function buildInsights(r) {
+  const tips = [];
+
+  if (r.transport > 2.5)
+    tips.push({
+      icon: '✈️', impact: 'high',
+      title: 'Cut air travel first',
+      desc: 'A single long-haul round trip burns through ~1.6 tCO₂e — more than the entire annual footprint of someone living in a low-income country. Train travel under 700 km is the straightforward swap.',
+      saving: `~${(r.transport * 0.35).toFixed(1)} tCO₂e/yr`,
+    });
+
+  if (fv('car-type', 0.192) > 0.1)
+    tips.push({
+      icon: '🚗', impact: 'high',
+      title: 'Go electric',
+      desc: 'Switching from petrol to a BEV on the Indian grid cuts per-km emissions by roughly 75%. Over a full lifecycle — manufacture, use, end-of-life — EVs win decisively even on a coal-heavy grid.',
+      saving: `~${(r.transport * 0.4).toFixed(1)} tCO₂e/yr`,
+    });
+
+  if (r.energy > 1.5)
+    tips.push({
+      icon: '☀️', impact: 'high',
+      title: 'Rooftop solar',
+      desc: 'A 2 kWp system in India produces around 2,800 kWh a year and recoups its carbon cost within 18 months. The economics are compelling too — payback period under 5 years in most states.',
+      saving: `~${(r.energy * 0.55).toFixed(1)} tCO₂e/yr`,
+    });
+
+  if (fv('electricity-kwh') > 150)
+    tips.push({
+      icon: '💡', impact: 'medium',
+      title: 'Upgrade to LED + BEE 5-star',
+      desc: 'LEDs use 85% less power than incandescents. A 5-star BEE refrigerator saves ~150 kWh/yr over a 3-star. Together these two changes typically cut household electricity by 20–30% with zero lifestyle change.',
+      saving: `~${(r.energy * 0.2).toFixed(1)} tCO₂e/yr`,
+    });
+
+  if (r.food > 2.0)
+    tips.push({
+      icon: '🥩', impact: 'high',
+      title: 'Less red meat',
+      desc: 'Beef and lamb produce 20–30× more GHG per gram of protein than lentils or chickpeas. One fewer beef meal per week is worth roughly 0.15 tCO₂e annually — that adds up.',
+      saving: `~${(r.food * 0.3).toFixed(1)} tCO₂e/yr`,
+    });
+
+  if (fv('food-waste', 0.3) >= 0.3)
+    tips.push({
+      icon: '🗑️', impact: 'medium',
+      title: 'Meal plan to cut waste',
+      desc: 'A third of all food produced never gets eaten, contributing ~8% of global GHG emissions. A weekly meal plan and better storage habits can halve what you throw out.',
+      saving: `~${(r.food * 0.15).toFixed(1)} tCO₂e/yr`,
+    });
+
+  if (fv('clothing-items') > 2)
+    tips.push({
+      icon: '👕', impact: 'medium',
+      title: 'Slow fashion',
+      desc: 'Fashion is responsible for ~10% of global carbon emissions. Second-hand first, rent for occasions, and when buying new, prioritise natural or recycled fibres over synthetics.',
+      saving: `~${(fv('clothing-items') * 12 * EF.CLOTHING_ITEM * 0.5 / 1000).toFixed(1)} tCO₂e/yr`,
+    });
+
+  tips.push({
+    icon: '🌳', impact: 'low',
+    title: 'Offset what remains',
+    desc: `Gold Standard verified offsets — India community biogas, Himalayan reforestation — can neutralise your residual ~${(r.total * 0.2).toFixed(1)} tCO₂e/yr while delivering real co-benefits for local communities.`,
+    saving: 'Neutralise residual',
+  });
+
+  const rank = { high: 0, medium: 1, low: 2 };
+  return tips.sort((a, b) => rank[a.impact] - rank[b.impact]);
+}
+
+// ── Renderers ────────────────────────────────────────────────────────────────
+
+function renderResults(r) {
+  setText('total-co2',     r.total);
+  setText('transport-co2', r.transport);
+  setText('energy-co2',    r.energy);
+  setText('food-co2',      r.food);
+  setText('donut-center-val', r.total);
+
+  const gauge = $('total-gauge');
+  if (gauge) requestAnimationFrame(() => {
+    gauge.style.width = `${Math.min(100, r.total / 20 * 100)}%`;
+  });
+
+  renderDonut(r);
+  $('results-section').classList.add('visible');
+}
+
+function renderDonut(r) {
+  const cats = [
+    { label: 'Transport', value: r.transport, color: '#29b6f6' },
+    { label: 'Energy',    value: r.energy,    color: '#ffb74d' },
+    { label: 'Food',      value: r.food,      color: '#66bb6a' },
+    { label: 'Shopping',  value: r.shopping,  color: '#ce93d8' },
+  ];
+
+  const total = r.total || 1;
+  const C = 2 * Math.PI * 54;
+  const seg = $('donut-segments');
+  const leg = $('donut-legend');
+  if (!seg || !leg) return;
+
+  seg.innerHTML = leg.innerHTML = '';
+  let offset = 0;
+
+  cats.forEach(c => {
+    const pct  = c.value / total;
+    const circ = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    circ.setAttribute('cx', 70); circ.setAttribute('cy', 70); circ.setAttribute('r', 54);
+    circ.setAttribute('fill', 'none');
+    circ.setAttribute('stroke', c.color);
+    circ.setAttribute('stroke-width', '22');
+    circ.setAttribute('stroke-dasharray', `${pct * C} ${C - pct * C}`);
+    circ.setAttribute('transform', `rotate(${(offset / total) * 360 - 90} 70 70)`);
+    circ.setAttribute('stroke-linecap', 'round');
+    seg.appendChild(circ);
+
+    const row = document.createElement('div');
+    row.className = 'legend-item';
+    row.innerHTML = `<span class="legend-dot" style="background:${esc(c.color)}"></span><span class="legend-name">${esc(c.label)}</span><span class="legend-pct">${(pct * 100).toFixed(0)}%</span>`;
+    leg.appendChild(row);
+
+    offset += c.value;
+  });
+}
+
+function renderInsights(tips, total) {
+  const list = $('insight-list');
+  const sub  = $('insights-sub');
+  if (!list) return;
+
+  $('insights-placeholder')?.remove();
+  list.querySelectorAll('.insight-card').forEach(el => el.remove());
+
+  if (sub) {
+    const gap = Math.max(0, total - 2.0).toFixed(1);
+    sub.textContent = total <= 2.0
+      ? '✅ Within the Paris 2050 target of 2 tCO₂e/yr'
+      : `Cut ${gap} tCO₂e/yr more to reach the Paris 2050 target`;
+  }
+
+  tips.forEach(t => {
+    const card = document.createElement('div');
+    card.className = 'insight-card';
+    card.setAttribute('role', 'listitem');
+    card.innerHTML = `
+      <div class="ic-icon" aria-hidden="true">${esc(t.icon)}</div>
+      <div class="ic-body">
+        <div class="ic-title">${esc(t.title)}</div>
+        <div class="ic-desc">${esc(t.desc)}</div>
+        <div class="ic-saving">💚 ${esc(t.saving)}</div>
+      </div>
+      <span class="ic-impact impact-${esc(t.impact)}">${esc(t.impact)}</span>`;
+    list.appendChild(card);
+  });
+}
+
+function renderComparison() {
+  const data = [
+    { flag: '🇮🇳', name: 'India',     avg: 1.8,  color: '#66bb6a' },
+    { flag: '🌍',  name: 'World Avg', avg: 4.7,  color: '#29b6f6' },
+    { flag: '🇨🇳', name: 'China',     avg: 8.4,  color: '#ffb74d' },
+    { flag: '🇬🇧', name: 'UK',        avg: 5.5,  color: '#ab47bc' },
+    { flag: '🇺🇸', name: 'USA',       avg: 14.9, color: '#ef5350' },
+    { flag: '🇦🇺', name: 'Australia', avg: 17.1, color: '#ff7043' },
+  ];
+
+  const max  = Math.max(...data.map(d => d.avg));
+  const grid = document.querySelector('.comparison-grid');
+  if (!grid) return;
+
+  data.forEach(d => {
+    const card = document.createElement('div');
+    card.className = 'compare-card';
+    card.setAttribute('role', 'listitem');
+    card.innerHTML = `
+      <div class="cc-flag" aria-hidden="true">${esc(d.flag)}</div>
+      <div class="cc-country">${esc(d.name)}</div>
+      <div class="cc-val" style="color:${esc(d.color)}">${d.avg}t <span style="font-size:.7rem;font-weight:400;color:var(--clr-text-muted)">CO₂e/yr</span></div>
+      <div class="bar-track" aria-hidden="true"><div class="bar-fill" style="--fill-clr:${esc(d.color)};--fill-w:${(d.avg/max*100).toFixed(1)}%"></div></div>`;
+    grid.appendChild(card);
+  });
+}
+
+function renderLog() {
+  const tbody = $('activity-tbody');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+
+  if (!state.log.length) {
+    tbody.innerHTML = '<tr><td colspan="5" class="log-empty">No activities logged yet — start tracking above.</td></tr>';
+    return;
+  }
+
+  state.log.forEach(e => {
+    const row = document.createElement('tr');
+    row.dataset.testid = `activity-row-${e.id}`;
+    row.innerHTML = `
+      <td>${esc(e.activity)}</td>
+      <td>${e.qty}</td>
+      <td><span class="emission-badge">🌿 ${e.emission} t</span></td>
+      <td>${esc(e.date)}</td>
+      <td><button class="delete-btn" data-id="${e.id}" aria-label="Remove ${esc(e.activity)}">✕</button></td>`;
+    tbody.appendChild(row);
+  });
+
+  tbody.querySelectorAll('.delete-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.log = state.log.filter(e => e.id !== +btn.dataset.id);
+      renderLog();
+      announce('Entry removed.');
+    }, { passive: true });
+  });
+}
+
+// ── Activity Tracker ─────────────────────────────────────────────────────────
+
+function addActivity() {
+  const sel = $('activity-type');
+  const qty = Math.max(0, parseFloat($('activity-qty')?.value) || 0);
+  if (!sel || !qty) return;
+
+  const opt      = sel.options[sel.selectedIndex];
+  const emission = +(qty * parseFloat(opt.dataset.factor ?? '0') / 1000).toFixed(4);
+
+  state.log = [...state.log, {
+    id:       ++logIdSeq,
+    activity: opt.text,
+    qty,
+    emission,
+    date: new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }),
+  }];
+
+  renderLog();
+  announce(`Logged ${opt.text}: ${emission} tCO₂e`);
+}
+
+// ── Tabs ─────────────────────────────────────────────────────────────────────
+
+function activateTab(name) {
+  document.querySelectorAll('[role="tab"]').forEach(btn => {
+    btn.setAttribute('aria-selected', String(btn.dataset.tab === name));
+  });
+  document.querySelectorAll('.calc-panel').forEach(panel => {
+    const on = panel.id === `panel-${name}`;
+    panel.classList.toggle('active', on);
+    on ? panel.removeAttribute('hidden') : panel.setAttribute('hidden', '');
+  });
+}
+
+function wireRange(rangeId, displayId, suffix = '') {
+  const range = $(rangeId), disp = $(displayId);
+  if (!range || !disp) return;
+  const sync = () => { disp.textContent = range.value + suffix; range.setAttribute('aria-valuenow', range.value); };
+  range.addEventListener('input', sync, { passive: true });
+  sync();
+}
+
+// ── Boot ─────────────────────────────────────────────────────────────────────
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('[role="tab"]').forEach(btn => {
+    btn.addEventListener('click', () => activateTab(btn.dataset.tab), { passive: true });
+    btn.addEventListener('keydown', e => {
+      const tabs = [...document.querySelectorAll('[role="tab"]')];
+      const i = tabs.indexOf(btn);
+      if (e.key === 'ArrowRight') { const next = tabs[(i + 1) % tabs.length]; next.focus(); activateTab(next.dataset.tab); }
+      if (e.key === 'ArrowLeft')  { const prev = tabs[(i - 1 + tabs.length) % tabs.length]; prev.focus(); activateTab(prev.dataset.tab); }
+    });
+  });
+
+  wireRange('flights-short',   'flights-short-val');
+  wireRange('flights-long',    'flights-long-val');
+  wireRange('renewable-pct',   'renewable-pct-val', '%');
+  wireRange('local-food',      'local-food-val',    '%');
+  wireRange('streaming-hours', 'streaming-val',     'h');
+
+  $('calculate-btn')?.addEventListener('click', () => {
+    const r    = calcEmissions();
+    const tips = buildInsights(r);
+    state.results = r;
+    renderResults(r);
+    renderInsights(tips, r.total);
+    announce(`Your footprint: ${r.total} tCO₂e per year.`);
+    $('results-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, { passive: true });
+
+  $('reset-btn')?.addEventListener('click', () => {
+    document.querySelectorAll('input[type="number"]').forEach(el => { el.value = el.defaultValue; });
+    document.querySelectorAll('input[type="range"]').forEach(el => { el.value = el.defaultValue; el.dispatchEvent(new Event('input')); });
+    document.querySelectorAll('select').forEach(el => { el.selectedIndex = 0; });
+    $('results-section')?.classList.remove('visible');
+    state.results = null;
+    announce('Reset.');
+  }, { passive: true });
+
+  $('add-activity-btn')?.addEventListener('click', addActivity, { passive: true });
+  $('activity-qty')?.addEventListener('keydown', e => { if (e.key === 'Enter') addActivity(); });
+
+  renderComparison();
+  renderLog();
+});
+</script>
+</body>
+</html>
