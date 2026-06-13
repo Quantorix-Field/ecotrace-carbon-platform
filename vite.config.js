@@ -5,10 +5,8 @@ export default defineConfig({
   plugins: [react({
     include: "**/*.{jsx,js,tsx,ts}",
   })],
-  root: "public",
   build: {
-    outDir: "../dist",
-    emptyOutDir: true,
+    outDir: "dist",
     sourcemap: false,
     rollupOptions: {
       output: {
