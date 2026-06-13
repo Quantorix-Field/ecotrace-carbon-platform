@@ -6,6 +6,8 @@
 [![React](https://img.shields.io/badge/React-18.3-61dafb.svg)](https://react.dev)
 [![Vite](https://img.shields.io/badge/Vite-5.3-646cff.svg)](https://vitejs.dev)
 [![Deployed on Vercel](https://img.shields.io/badge/deployed-Vercel-black.svg)](https://ecotrace-carbon-platform.vercel.app)
+[![CI](https://github.com/Quantorix-Field/ecotrace-carbon-platform/actions/workflows/ci.yml/badge.svg)](https://github.com/Quantorix-Field/ecotrace-carbon-platform/actions)
+[![Coverage](https://img.shields.io/badge/coverage-80%25+-brightgreen.svg)](#testing)
 
 **Live demo:** [ecotrace-carbon-platform.vercel.app](https://ecotrace-carbon-platform.vercel.app)
 
@@ -71,6 +73,9 @@ ecotrace-carbon-platform/
 │   ├── setup.js             # jest-dom matchers
 │   └── __mocks__/
 │       └── styleMock.js     # CSS module mock for Jest
+├── .github/
+│   └── workflows/
+│       └── ci.yml           # CI pipeline — test + build on Node 18 and 20
 ├── babel.config.js
 ├── vite.config.js
 └── package.json
@@ -161,6 +166,14 @@ Coverage thresholds enforced in `package.json`:
 | Lines | 80% |
 
 Tests cover all public utility functions — `calcTransport`, `calcEnergy`, `calcFood`, `calcShopping`, `calcTotal`, `getBreakdown`, `parisGap`, `generateInsights`, `topInsights`, and `totalPotentialSaving` — with 110 assertions across 10 describe blocks.
+
+### CI pipeline
+
+Every push to `main` triggers the GitHub Actions workflow which:
+- Installs dependencies with `npm ci`
+- Runs the full test suite with coverage on Node 18 and Node 20
+- Builds the production bundle with `npm run build`
+- Fails the pipeline if any test fails or coverage drops below threshold
 
 ---
 
