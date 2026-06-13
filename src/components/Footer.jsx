@@ -116,7 +116,7 @@ export default function Footer() {
             >
               Purushotam Kumar
             </a>{" "}
-            · MIT License
+            · <a href="https://github.com/Quantorix-Field/ecotrace-carbon-platform/blob/main/LICENSE" target="_blank" rel="noopener noreferrer" style={{color: "var(--green-500)", textDecoration: "none", fontWeight: 600}}>MIT License</a>
           </p>
           <p style={{ fontSize: "0.8125rem", color: "var(--gray-600)", margin: 0, textAlign: "right" }}>
             Emission factors: IPCC AR6 WG3 (2022) · IEA 2024 · CEA 2023
