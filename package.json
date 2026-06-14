@@ -1,6 +1,6 @@
 {
   "name": "ecotrace-carbon-platform",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "private": true,
   "description": "Carbon footprint awareness platform — track, understand, and reduce your emissions.",
   "author": "Purushotam Kumar",
@@ -11,7 +11,7 @@
     "preview": "vite preview",
     "test": "jest --coverage",
     "test:watch": "jest --watch",
-    "lint": "eslint src --ext .js,.jsx --report-unused-disable-directives"
+    "lint": "eslint src --ext .ts,.tsx --report-unused-disable-directives"
   },
   "dependencies": {
     "react": "^18.3.1",
@@ -21,9 +21,14 @@
     "@babel/core": "^7.24.7",
     "@babel/preset-env": "^7.24.7",
     "@babel/preset-react": "^7.24.7",
+    "@babel/preset-typescript": "^7.24.7",
     "@testing-library/jest-dom": "^6.4.6",
     "@testing-library/react": "^16.0.0",
     "@testing-library/user-event": "^14.5.2",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@typescript-eslint/eslint-plugin": "^7.13.0",
+    "@typescript-eslint/parser": "^7.13.0",
     "@vitejs/plugin-react": "^4.3.1",
     "babel-jest": "^29.7.0",
     "eslint": "^8.57.0",
@@ -31,7 +36,7 @@
     "eslint-plugin-react-hooks": "^4.6.2",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
-    "prop-types": "^15.8.1",
+    "typescript": "^5.4.5",
     "vite": "^5.3.1"
   },
   "jest": {
@@ -54,7 +59,7 @@
       }
     },
     "collectCoverageFrom": [
-      "src/utils/**/*.js"
+      "src/utils/**/*.ts"
     ]
   },
   "browserslist": {
