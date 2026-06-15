@@ -4,6 +4,7 @@
 
 [![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](./LICENSE)
 [![React](https://img.shields.io/badge/React-18.3-61dafb.svg)](https://react.dev)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.4-3178c6.svg)](https://www.typescriptlang.org)
 [![Vite](https://img.shields.io/badge/Vite-5.3-646cff.svg)](https://vitejs.dev)
 [![Deployed on Vercel](https://img.shields.io/badge/deployed-Vercel-black.svg)](https://ecotrace-carbon-platform.vercel.app)
 [![CI](https://github.com/Quantorix-Field/ecotrace-carbon-platform/actions/workflows/ci.yml/badge.svg)](https://github.com/Quantorix-Field/ecotrace-carbon-platform/actions)
@@ -25,7 +26,7 @@ EcoTrace calculates your annual CO₂e emissions across four life categories, ra
 | Personalised action plan | 16 actions ranked by impact tier + estimated annual saving |
 | Paris 2050 gap tracker | Visual progress bar vs 500 kg CO₂e / person target |
 | Global comparison | India, World, China, UK, USA, Australia — interactive bars |
-| Daily activity log | Log eco-actions, track streaks, filter by category |
+| Daily activity log | Log eco-actions, track streaks, persist across sessions |
 | PWA-ready | Service worker, web manifest, offline shell |
 | Accessibility | WCAG 2.1 AA — skip link, ARIA roles, reduced-motion support |
 
@@ -34,11 +35,14 @@ EcoTrace calculates your annual CO₂e emissions across four life categories, ra
 ## Tech stack
 
 - **React 18** — functional components, hooks, no class components
+- **TypeScript 5.4** — strict mode, full type coverage across all components and utilities
 - **Vite 5** — dev server + production build with vendor chunk splitting
 - **Jest 29 + Testing Library** — unit tests with coverage thresholds
-- **PropTypes** — runtime prop validation on every component
+- **ESLint** — TypeScript-aware linting with react-hooks plugin
 - **Vanilla CSS** — design token system via CSS custom properties, no CSS framework
 - **Service Worker** — cache-first static assets, network-first API routes
+- **Custom hooks** — `useEmissions`, `useLocalStorage` for clean state management
+- **Error boundaries** — typed React error boundary with graceful fallback UI
 
 ---
 
@@ -46,39 +50,48 @@ EcoTrace calculates your annual CO₂e emissions across four life categories, ra
 
 ```
 ecotrace-carbon-platform/
-├── public/
-│   ├── index.html          # App shell — OG tags, manifest link, noscript fallback
-│   └── sw.js               # Service worker — cache-first with versioned cache busting
-├── src/
-│   ├── components/
-│   │   ├── Header.jsx       # Sticky nav with scroll blur + mobile hamburger menu
-│   │   ├── Hero.jsx         # Landing section with stat cards and trust signals
-│   │   ├── StatsStrip.jsx   # Scrolling ticker (mobile) / grid (desktop) of climate stats
-│   │   ├── Calculator.jsx   # 4-tab form — Transport, Energy, Food, Shopping
-│   │   ├── Results.jsx      # SVG donut chart, Paris gap tracker, global comparison bars
-│   │   ├── Insights.jsx     # Filterable action cards ranked by impact + saving
-│   │   ├── ActivityLog.jsx  # Daily eco-action log with streak counter
-│   │   ├── GlobalContext.jsx # Dark section — per-country emission bars with inline notes
-│   │   └── Footer.jsx       # Links, data source citations, author credit
-│   ├── utils/
-│   │   ├── emissions.js     # Pure calculation functions + IPCC/IEA emission factors
-│   │   └── insights.js      # Action library with trigger predicates and saving estimators
-│   ├── styles/
-│   │   └── global.css       # Design tokens, reset, typography, layout utilities
-│   ├── App.jsx              # Root — state management, emissions derivation, layout
-│   └── index.js             # React DOM entry + service worker registration
-├── tests/
-│   ├── emissions.test.js    # 67 assertions — all calc functions + constants
-│   ├── insights.test.js     # 43 assertions — generateInsights, topInsights, totalPotentialSaving
-│   ├── setup.js             # jest-dom matchers
-│   └── __mocks__/
-│       └── styleMock.js     # CSS module mock for Jest
 ├── .github/
 │   └── workflows/
-│       └── ci.yml           # CI pipeline — test + build on Node 18 and 20
-├── babel.config.js
-├── vite.config.js
-└── package.json
+│       └── ci.yml              # GitHub Actions — test, type-check, build
+├── public/
+│   ├── index.html              # App shell — OG tags, manifest link, noscript fallback
+│   └── sw.js                   # Service worker — cache-first with versioned cache busting
+├── src/
+│   ├── components/
+│   │   ├── ErrorBoundary.tsx   # Typed error boundary with dev-mode error display
+│   │   ├── Header.tsx          # Sticky nav with scroll blur + mobile hamburger menu
+│   │   ├── Hero.tsx            # Landing section with stat cards and trust signals
+│   │   ├── StatsStrip.tsx      # Scrolling ticker (mobile) / grid (desktop) of climate stats
+│   │   ├── Calculator.tsx      # 4-tab form — Transport, Energy, Food, Shopping
+│   │   ├── Results.tsx         # SVG donut chart, Paris gap tracker, global comparison bars
+│   │   ├── Insights.tsx        # Filterable action cards ranked by impact + saving
+│   │   ├── ActivityLog.tsx     # Daily eco-action log with streak counter + localStorage
+│   │   ├── GlobalContext.tsx   # Dark section — per-country emission bars with inline notes
+│   │   └── Footer.tsx          # Links, data source citations, author credit
+│   ├── hooks/
+│   │   ├── useEmissions.ts     # Memoised emission calculations from user inputs
+│   │   └── useLocalStorage.ts  # Generic typed localStorage persistence hook
+│   ├── types/
+│   │   └── index.ts            # Shared TypeScript interfaces and type aliases
+│   ├── utils/
+│   │   ├── emissions.ts        # Pure calc functions + IPCC/IEA emission factors + JSDoc
+│   │   └── insights.ts         # Action library with trigger predicates and saving estimators
+│   ├── styles/
+│   │   └── global.css          # Design tokens, reset, typography, layout utilities
+│   ├── App.tsx                 # Root — state management, emissions derivation, layout
+│   └── index.tsx               # React DOM entry + service worker registration
+├── tests/
+│   ├── emissions.test.js       # 67 assertions — all calc functions + constants
+│   ├── insights.test.js        # 43 assertions — generateInsights, topInsights, totalPotentialSaving
+│   ├── setup.js                # jest-dom matchers
+│   └── __mocks__/
+│       └── styleMock.js        # CSS module mock for Jest
+├── .eslintrc.js                # TypeScript-aware ESLint configuration
+├── babel.config.js             # Babel config with TypeScript preset for Jest
+├── tsconfig.json               # TypeScript strict mode configuration
+├── tsconfig.node.json          # TypeScript config for Vite/Node tooling
+├── vite.config.js              # Vite build config with vendor chunk splitting
+└── package.json                # Dependencies, scripts, Jest config with coverage thresholds
 ```
 
 ---
@@ -100,6 +113,9 @@ npm run dev
 
 # Run tests
 npm test
+
+# Type check
+npx tsc --noEmit
 
 # Production build
 npm run build
@@ -152,8 +168,9 @@ All factors are in **kg CO₂e per unit**.
 ## Testing
 
 ```bash
-npm test              # run all tests with coverage
-npm run test:watch    # watch mode during development
+npm test                  # run all tests with coverage
+npm run test:watch        # watch mode during development
+npx tsc --noEmit          # type check without emitting files
 ```
 
 Coverage thresholds enforced in `package.json`:
@@ -167,25 +184,23 @@ Coverage thresholds enforced in `package.json`:
 
 Tests cover all public utility functions — `calcTransport`, `calcEnergy`, `calcFood`, `calcShopping`, `calcTotal`, `getBreakdown`, `parisGap`, `generateInsights`, `topInsights`, and `totalPotentialSaving` — with 110 assertions across 10 describe blocks.
 
-### CI pipeline
-
-Every push to `main` triggers the GitHub Actions workflow which:
-- Installs dependencies with `npm ci`
-- Runs the full test suite with coverage on Node 18 and Node 20
-- Builds the production bundle with `npm run build`
-- Fails the pipeline if any test fails or coverage drops below threshold
-
 ---
 
 ## Architecture decisions
 
-**State in App.jsx only.** All inputs and derived emissions live at the root. Components receive what they need via props — no context, no external state library. For an app this size, that's the right call.
+**TypeScript strict mode.** Every component, hook, and utility is fully typed. Shared interfaces live in `src/types/index.ts` so there's one source of truth for data shapes across the entire app.
 
-**Pure utility functions.** `emissions.js` and `insights.js` contain zero React. Every function takes plain objects and returns numbers or arrays. This makes them trivially testable and reusable.
+**Custom hooks for clean separation.** `useEmissions` encapsulates all emission calculations with memoisation. `useLocalStorage` provides typed persistence without any external library.
 
-**No charting library.** The donut chart in Results is raw SVG — 30 lines, no bundle weight, fully accessible via `aria-label`. A charting library would add ~50 kB for no functional gain.
+**State in App.tsx only.** All inputs and derived emissions live at the root. Components receive what they need via props — no context, no external state library.
 
-**CSS custom properties over Tailwind.** The design token system in `global.css` gives full control over the visual language without a compiler step or class name explosion in JSX.
+**Pure utility functions.** `emissions.ts` and `insights.ts` contain zero React. Every function takes plain objects and returns numbers or arrays — trivially testable and reusable.
+
+**No charting library.** The donut chart in Results is raw SVG — 30 lines, no bundle weight, fully accessible via `aria-label`.
+
+**Error boundary at root.** `ErrorBoundary.tsx` wraps the entire app so any runtime error shows a graceful fallback instead of a blank screen.
+
+**CSS custom properties over Tailwind.** The design token system in `global.css` gives full control without a compiler step.
 
 ---
 
