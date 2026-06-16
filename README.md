@@ -6,11 +6,11 @@
 [![React](https://img.shields.io/badge/React-18.3-61dafb.svg)](https://react.dev)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.4-3178c6.svg)](https://www.typescriptlang.org)
 [![Vite](https://img.shields.io/badge/Vite-5.3-646cff.svg)](https://vitejs.dev)
-[![Deployed on Vercel](https://img.shields.io/badge/deployed-Vercel-black.svg)](https://ecotrace-carbon-platform.vercel.app)
+[![Deployed on Vercel](https://img.shields.io/badge/deployed-Vercel-black.svg)](https://ecotrace-carbon-platform-pi.vercel.app)
 [![CI](https://github.com/Quantorix-Field/ecotrace-carbon-platform/actions/workflows/ci.yml/badge.svg)](https://github.com/Quantorix-Field/ecotrace-carbon-platform/actions)
 [![Coverage](https://img.shields.io/badge/coverage-80%25+-brightgreen.svg)](#testing)
 
-**Live demo:** [ecotrace-carbon-platform.vercel.app](https://ecotrace-carbon-platform.vercel.app)
+**Live demo:** [ecotrace-carbon-platform-pi.vercel.app](https://ecotrace-carbon-platform-pi.vercel.app)
 
 ---
 
